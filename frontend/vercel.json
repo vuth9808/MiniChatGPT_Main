@@ -6,9 +6,6 @@
   "outputDirectory": "dist",
   "public": true,
   "env": {
-    "VITE_API_BASE_URL": {
-      "description": "Backend API base URL",
-      "required": false
-    }
+    "VITE_API_BASE_URL": "@vite-api-base-url"
   }
 }
