@@ -1,0 +1,61 @@
+services:
+  - type: web
+    name: mini-chatgpt-backend
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: cd backend && npm install
+    startCommand: cd backend && npm run start
+    
+    envVars:
+      - key: NODE_ENV
+        value: production
+        
+      - key: PORT
+        value: 5000
+        
+      - key: DB_HOST
+        scope: build
+        
+      - key: DB_PORT
+        value: 5432
+        scope: build
+        
+      - key: DB_USER
+        scope: build
+        
+      - key: DB_PASSWORD
+        scope: build
+        
+      - key: DB_NAME
+        value: postgres
+        scope: build
+        
+      - key: JWT_SECRET
+        scope: build
+        
+      - key: JWT_EXPIRES_IN
+        value: 7d
+        
+      - key: GEMINI_API_KEY
+        scope: build
+        
+      - key: GEMINI_MODEL
+        value: gemini-pro
+        
+      - key: CLIENT_ORIGIN
+        value: https://your-frontend.vercel.app
+        scope: build
+
+# Database: Use Supabase (configure manually)
+# Database:
+#   name: mini-chatgpt-db
+#   plan: free
+#   region: singapore
+#   postgresVersion: 15
+
+# Notes:
+# 1. Configure environment variables in Render dashboard
+# 2. Database: Create on Supabase independently
+# 3. Frontend: Deploy separately on Vercel
+# 4. Update CLIENT_ORIGIN after frontend goes live
