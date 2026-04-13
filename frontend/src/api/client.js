@@ -4,10 +4,16 @@ const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"
 });
 
-// Request interceptor: Add token to all requests
+// Request interceptor: Add token to all requests except public endpoints
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-  if (token) config.headers.Authorization = `Bearer ${token}`;
+  // Don't add token for public endpoints
+  const publicEndpoints = ['/login', '/register'];
+  const isPublic = publicEndpoints.some(ep => config.url.includes(ep));
+  
+  if (!isPublic) {
+    const token = localStorage.getItem("token");
+    if (token) config.headers.Authorization = `Bearer ${token}`;
+  }
   return config;
 });
 
