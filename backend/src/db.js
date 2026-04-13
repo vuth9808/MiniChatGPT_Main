@@ -1,16 +1,13 @@
 const { Pool } = require("pg");
-const { env } = require("./utils/env");
 
 const pool = new Pool({
-  host: env.DB_HOST,
-  port: env.DB_PORT,
-  user: env.DB_USER,
-  password: env.DB_PASSWORD,
-  database: env.DB_NAME,
-  ssl: env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false,
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false,
+  },
   max: 10,
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000
+  connectionTimeoutMillis: 2000,
 });
 
 async function query(sql, params = []) {
@@ -19,4 +16,3 @@ async function query(sql, params = []) {
 }
 
 module.exports = { pool, query };
-
