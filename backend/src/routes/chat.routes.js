@@ -33,7 +33,8 @@ router.post("/conversations", authRequired, async (req, res, next) => {
     // This prevents creating empty conversations when quota is exceeded
     try {
       // Make a minimal test call to check quota
-      await generateAssistantReply({ message: "(quota check)" });
+      const quotaCheckContents = [{ role: 'user', parts: [{ text: '(quota check)' }] }];
+      await generateAssistantReply({ contents: quotaCheckContents });
     } catch (quotaCheckErr) {
       // If Gemini returns quota error, reject conversation creation
       const errorType = classifyGeminiError(quotaCheckErr);
@@ -119,18 +120,34 @@ router.post("/conversations/:id/messages", authRequired, async (req, res, next) 
       );
     }
 
-    // Add user message to conversation
-    await query(
-      `INSERT INTO messages (conversation_id, role, content) VALUES ($1, 'user', $2)`,
-      [conversationId, String(message).trim()]
+    // Query last 20 messages from conversation (oldest first for Gemini context)
+    const historyRows = await query(
+      `SELECT role, content FROM messages 
+       WHERE conversation_id = $1 
+       ORDER BY created_at DESC 
+       LIMIT 20`,
+      [conversationId]
     );
+    
+    // Reverse to get chronological order, then build contents array
+    const history = historyRows.reverse();
+    const contents = history.map(msg => ({
+      role: msg.role === 'user' ? 'user' : 'model',
+      parts: [{ text: msg.content }]
+    }));
+    
+    // Append current user message
+    contents.push({
+      role: 'user',
+      parts: [{ text: String(message).trim() }]
+    });
 
     // Generate AI response
     let responseText;
     let geminiError = null;
 
     try {
-      responseText = await generateAssistantReply({ message });
+      responseText = await generateAssistantReply({ contents });
     } catch (err) {
       geminiError = err;
       console.error("[GEMINI_ERROR]", err.message);
@@ -158,6 +175,12 @@ router.post("/conversations/:id/messages", authRequired, async (req, res, next) 
       }
     }
 
+    // Add user message to database
+    const userMsgResult = await query(
+      `INSERT INTO messages (conversation_id, role, content) VALUES ($1, 'user', $2) RETURNING id`,
+      [conversationId, String(message).trim()]
+    );
+
     // Add assistant message to conversation
     const result = await query(
       `INSERT INTO messages (conversation_id, role, content) VALUES ($1, 'assistant', $2) RETURNING id`,
@@ -172,7 +195,7 @@ router.post("/conversations/:id/messages", authRequired, async (req, res, next) 
 
     return res.status(201).json({
       messages: [
-        { id: null, role: "user", content: String(message).trim(), created_at: new Date() },
+        { id: userMsgResult[0].id, role: "user", content: String(message).trim(), created_at: new Date() },
         { id: result[0].id, role: "assistant", content: responseText, created_at: new Date() }
       ]
     });
@@ -232,7 +255,8 @@ router.post("/chat", authOptional, async (req, res, next) => {
 
     let responseText;
     try {
-      responseText = await generateAssistantReply({ message });
+      const contents = [{ role: 'user', parts: [{ text: String(message).trim() }] }];
+      responseText = await generateAssistantReply({ contents });
     } catch (err) {
       console.error("[GEMINI_ERROR]", err.message);
       const errorType = classifyGeminiError(err);
