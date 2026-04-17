@@ -1,4 +1,4 @@
-const { GoogleGenerativeAI } = require("@google/genai");
+const { GoogleGenerativeAI } = require("@google/genai").default || require("@google/genai");
 const { env } = require("./env");
 const { get: getCached, set: setCached } = require("./cache");
 
