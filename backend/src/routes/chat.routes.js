@@ -24,38 +24,26 @@ router.get("/conversations", authRequired, async (req, res, next) => {
 });
 
 // POST /conversations - create a new conversation
-// VALIDATION: Check quota before creating (prevent empty conversations)
+// FIX: Removed quota check call — no longer wastes an API call on every new conversation.
+// Quota errors are handled naturally when the first message is sent.
 router.post("/conversations", authRequired, async (req, res, next) => {
   try {
     const { title } = req.body || {};
-    
-    // Quick quota check: test Gemini availability before creating conversation
-    // This prevents creating empty conversations when quota is exceeded
-    try {
-      // Make a minimal test call to check quota
-      const quotaCheckContents = [{ role: 'user', parts: [{ text: '(quota check)' }] }];
-      await generateAssistantReply({ contents: quotaCheckContents });
-    } catch (quotaCheckErr) {
-      // If Gemini returns quota error, reject conversation creation
-      const errorType = classifyGeminiError(quotaCheckErr);
-      if (errorType === ERROR_TYPES.QUOTA_EXCEEDED) {
-        console.warn("[QUOTA_CHECK] Quota exceeded - rejecting conversation creation");
-        return res.status(429).json(
-          formatErrorResponse(null, ERROR_TYPES.QUOTA_EXCEEDED)
-        );
-      }
-      // For other errors, allow conversation creation (might succeed later with retries)
-    }
-    
     const conversationTitle = title || "New Conversation";
-    
+
     const result = await query(
       `INSERT INTO conversations (user_id, title) VALUES ($1, $2) RETURNING id`,
       [req.user.id, conversationTitle]
     );
-    
+
     return res.status(201).json({
-      conversation: { id: result[0].id, title: conversationTitle, created_at: new Date(), updated_at: new Date(), messages: [] }
+      conversation: {
+        id: result[0].id,
+        title: conversationTitle,
+        created_at: new Date(),
+        updated_at: new Date(),
+        messages: []
+      }
     });
   } catch (err) {
     return next(err);
@@ -93,7 +81,7 @@ router.post("/conversations/:id/messages", authRequired, async (req, res, next) 
   try {
     const conversationId = Number(req.params.id);
     const { message } = req.body || {};
-    
+
     if (!conversationId) return res.status(400).json({ message: "Invalid conversation id" });
     if (!message || !String(message).trim()) {
       return res.status(400).json(
@@ -120,7 +108,8 @@ router.post("/conversations/:id/messages", authRequired, async (req, res, next) 
       );
     }
 
-    // Query last 20 messages from conversation (oldest first for Gemini context)
+    // FIX: Reduced from 20 → 10 messages to reduce input tokens sent to Gemini.
+    // 10 messages is sufficient context for most conversations.
     const historyRows = await query(
       `SELECT role, content FROM messages 
        WHERE conversation_id = $1 
@@ -128,14 +117,14 @@ router.post("/conversations/:id/messages", authRequired, async (req, res, next) 
        LIMIT 10`,
       [conversationId]
     );
-    
+
     // Reverse to get chronological order, then build contents array
     const history = historyRows.reverse();
     const contents = history.map(msg => ({
       role: msg.role === 'user' ? 'user' : 'model',
       parts: [{ text: msg.content }]
     }));
-    
+
     // Append current user message
     contents.push({
       role: 'user',
@@ -144,19 +133,16 @@ router.post("/conversations/:id/messages", authRequired, async (req, res, next) 
 
     // Generate AI response
     let responseText;
-    let geminiError = null;
 
     try {
       responseText = await generateAssistantReply({ contents });
     } catch (err) {
-      geminiError = err;
       console.error("[GEMINI_ERROR]", err.message);
 
-      // Classify the error
       const errorType = classifyGeminiError(err);
       console.log(`[GEMINI_ERROR_CLASSIFIED] Type: ${errorType}`);
 
-      // For quota exceeded, return 429 with QUOTA_EXCEEDED flag
+      // For quota exceeded, return 429 immediately — do not save to DB
       if (errorType === ERROR_TYPES.QUOTA_EXCEEDED) {
         console.warn("[QUOTA_EXCEEDED] Daily quota exhausted for user:", req.user.id);
         return res.status(429).json(
@@ -164,39 +150,35 @@ router.post("/conversations/:id/messages", authRequired, async (req, res, next) 
         );
       }
 
-      // For rate limit, we can try fallback
-      if (errorType === ERROR_TYPES.RATE_LIMIT) {
-        console.warn("[RATE_LIMIT_FROM_API] Trying fallback response");
-        responseText = getFallbackResponse();
-      } else {
-        // For other server errors, also try fallback
-        console.warn("[SERVER_ERROR_FROM_API] Trying fallback response");
-        responseText = getFallbackResponse();
-      }
+      // For rate limit or other server errors, use fallback response
+      console.warn("[FALLBACK] Using fallback response due to:", err.message);
+      responseText = getFallbackResponse();
     }
 
-    // Add user message to database
-    const userMsgResult = await query(
-      `INSERT INTO messages (conversation_id, role, content) VALUES ($1, 'user', $2) RETURNING id`,
-      [conversationId, String(message).trim()]
+    const userContent = String(message).trim();
+
+    // FIX: Merged 2 separate INSERT queries into 1 to reduce DB round trips.
+    // Also merged the UPDATE updated_at into the same transaction using a CTE.
+    const insertResult = await query(
+      `WITH ins AS (
+         INSERT INTO messages (conversation_id, role, content)
+         VALUES ($1, 'user', $2), ($1, 'assistant', $3)
+         RETURNING id, role
+       ),
+       upd AS (
+         UPDATE conversations SET updated_at = CURRENT_TIMESTAMP WHERE id = $1
+       )
+       SELECT id, role FROM ins`,
+      [conversationId, userContent, responseText]
     );
 
-    // Add assistant message to conversation
-    const result = await query(
-      `INSERT INTO messages (conversation_id, role, content) VALUES ($1, 'assistant', $2) RETURNING id`,
-      [conversationId, responseText]
-    );
-
-    // Update conversation's updated_at timestamp
-    await query(
-      `UPDATE conversations SET updated_at = CURRENT_TIMESTAMP WHERE id = $1`,
-      [conversationId]
-    );
+    const userMsg   = insertResult.find(r => r.role === 'user');
+    const assistantMsg = insertResult.find(r => r.role === 'assistant');
 
     return res.status(201).json({
       messages: [
-        { id: userMsgResult[0].id, role: "user", content: String(message).trim(), created_at: new Date() },
-        { id: result[0].id, role: "assistant", content: responseText, created_at: new Date() }
+        { id: userMsg.id,      role: "user",      content: userContent,   created_at: new Date() },
+        { id: assistantMsg.id, role: "assistant",  content: responseText,  created_at: new Date() }
       ]
     });
   } catch (err) {
@@ -223,7 +205,7 @@ router.delete("/conversations/:id", authRequired, async (req, res, next) => {
   }
 });
 
-// GET /chat - DEPRECATED: kept for backwards compatibility, redirects to conversations
+// GET /chat - DEPRECATED: kept for backwards compatibility
 router.get("/chat", authRequired, async (req, res, next) => {
   try {
     const chats = await query(
@@ -236,7 +218,7 @@ router.get("/chat", authRequired, async (req, res, next) => {
   }
 });
 
-// POST /chat - DEPRECATED: kept for backwards compatibility (creates temp conversation)
+// POST /chat - DEPRECATED: kept for backwards compatibility (guest/temp conversation)
 router.post("/chat", authOptional, async (req, res, next) => {
   try {
     if (!checkLimit(req)) {
@@ -261,7 +243,6 @@ router.post("/chat", authOptional, async (req, res, next) => {
       console.error("[GEMINI_ERROR]", err.message);
       const errorType = classifyGeminiError(err);
 
-      // For quota exceeded, return proper error
       if (errorType === ERROR_TYPES.QUOTA_EXCEEDED) {
         console.warn("[QUOTA_EXCEEDED] Daily quota exhausted");
         return res.status(429).json(
@@ -269,7 +250,6 @@ router.post("/chat", authOptional, async (req, res, next) => {
         );
       }
 
-      // Otherwise use fallback
       responseText = getFallbackResponse();
       console.warn(`[FALLBACK] Using fallback response due to: ${err.message}`);
     }
@@ -313,4 +293,3 @@ router.delete("/chat/:id", authRequired, async (req, res, next) => {
 });
 
 module.exports = router;
-
