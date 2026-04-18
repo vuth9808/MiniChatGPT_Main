@@ -19,7 +19,7 @@ async function generateAssistantReply({ contents }) {
       systemInstruction: SYSTEM_INSTRUCTION,
       generationConfig: {
         temperature: 0.7,
-        maxOutputTokens: 300
+        maxOutputTokens: 150
       }
     });
 
