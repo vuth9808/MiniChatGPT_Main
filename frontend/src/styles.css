@@ -53,6 +53,51 @@ a {
   color: inherit;
 }
 
+/* ── Thinking Animation ── */
+.thinkingBubble {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 18px;
+}
+
+.thinkingLabel {
+  font-size: 13px;
+  color: var(--muted);
+  font-style: italic;
+  margin-right: 4px;
+}
+
+.thinkingDots {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.thinkingDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--primary);
+  animation: dotBounce 1.2s ease-in-out infinite;
+  opacity: 0.8;
+}
+
+.thinkingDot:nth-child(1) { animation-delay: 0s; }
+.thinkingDot:nth-child(2) { animation-delay: 0.2s; }
+.thinkingDot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes dotBounce {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+  30% {
+    transform: translateY(-8px);
+    opacity: 1;
+  }
+}
+
 .muted {
   color: var(--muted);
 }
