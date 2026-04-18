@@ -1,62 +1,58 @@
-const { GoogleGenerativeAI } = require("@google/genai").default || require("@google/genai");
+const { GoogleGenAI } = require("@google/genai");
 const { env } = require("./env");
 const { get: getCached, set: setCached } = require("./cache");
 
-const genAI = new GoogleGenerativeAI(env.GEMINI_API_KEY);
+const genAI = new GoogleGenAI({ apiKey: env.GEMINI_API_KEY });
 
 const SYSTEM_INSTRUCTION =
   "You are a friendly and helpful AI assistant in a chat app. Provide clear, conversational responses. Use the chat history to maintain context and continuity. Be concise but helpful, and try to give direct answers unless the user asks for more detail.";
 
 async function generateAssistantReply({ contents }) {
-  // Check cache first
   const cacheKey = JSON.stringify(contents);
   const cached = getCached(cacheKey);
-  if (cached) {
-    return cached;
-  }
+  if (cached) return cached;
 
   try {
-    const model = genAI.getGenerativeModel({
+    const result = await genAI.models.generateContent({
       model: env.GEMINI_MODEL,
+      contents,
       systemInstruction: SYSTEM_INSTRUCTION,
-      generationConfig: { 
+      generationConfig: {
         temperature: 0.7,
         maxOutputTokens: 300
       }
     });
 
-    const result = await model.generateContent(contents);
-    const text = result.response.text();
+    const text = result.text || "";
     const trimmed = text.trim();
-    
-    // Cache successful response
+
+    // Cache lại
     setCached(cacheKey, trimmed);
-    
+
     return trimmed;
+
   } catch (err) {
     const msg = String(err?.message || "Gemini request failed");
     const e = new Error("AI service is temporarily unavailable");
 
-    // Detect quota exceeded vs rate limit
     if (msg.includes("[429")) {
       e.status = 429;
-      
-      // Check if it's specifically quota exceeded
-      if (msg.includes("quota") || msg.includes("Quota") || msg.toLowerCase().includes("resource has been exhausted")) {
+
+      if (
+        msg.toLowerCase().includes("quota") ||
+        msg.toLowerCase().includes("resource exhausted")
+      ) {
         e.message = "Daily quota exceeded. Please try again tomorrow.";
-        e.isQuotaExceeded = true;  // Mark as quota for backend to identify
+        e.isQuotaExceeded = true;
       } else {
-        e.message = "Too many requests. Please wait a moment before trying again.";
-        e.isRateLimit = true;      // Mark as rate limit
+        e.message = "Too many requests. Please wait a moment.";
+        e.isRateLimit = true;
       }
+
     } else if (msg.includes("[404")) {
       e.status = 503;
-      e.message = `AI model "${env.GEMINI_MODEL}" is unavailable. Please check GEMINI_MODEL.`;
-    } else if (msg.toLowerCase().includes("resource exhausted")) {
-      // Gemini sometimes reports quota as "resource exhausted"
-      e.status = 429;
-      e.message = "Daily quota exceeded. Please try again tomorrow.";
-      e.isQuotaExceeded = true;
+      e.message = `AI model "${env.GEMINI_MODEL}" is unavailable. Check GEMINI_MODEL.`;
+
     } else {
       e.status = 503;
       e.message = "AI service error. Please try again.";
