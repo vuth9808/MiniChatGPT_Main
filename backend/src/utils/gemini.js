@@ -18,9 +18,13 @@ async function generateAssistantReply({ contents }) {
       contents,
       systemInstruction: SYSTEM_INSTRUCTION,
       generationConfig: {
-        temperature: 0.7,
-        maxOutputTokens: 150
-      }
+    temperature: 0.5,
+    maxOutputTokens: 600
+  },
+  // Tắt thinking để giảm TTFT từ 5.65s xuống ~1s
+  thinkingConfig: {
+    thinkingBudget: 0
+  }
     });
 
     const text = result.text || "";
