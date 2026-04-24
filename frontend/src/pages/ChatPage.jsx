@@ -78,29 +78,50 @@ export default function ChatPage() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages.length, sending, typingIndex]);
 
-  // Typing effect
-  useEffect(() => {
-    if (!isTyping) return;
+ // Typing effect (optimized)
+useEffect(() => {
+  if (!isTyping) return;
 
-    const lastMessage = messages[messages.length - 1];
-    if (!lastMessage || lastMessage.role !== "assistant") {
-      setIsTyping(false);
-      return;
-    }
+  const lastMessage = messages[messages.length - 1];
+  if (!lastMessage || lastMessage.role !== "assistant") {
+    setIsTyping(false);
+    return;
+  }
 
-    const fullText = lastMessage.content;
-    const speed = 15;
+  const fullText = lastMessage.content;
 
-    if (typingIndex < fullText.length) {
-      const timer = setTimeout(() => {
-        setTypingIndex((prev) => prev + 1);
-      }, speed);
-      return () => clearTimeout(timer);
-    } else {
-      setIsTyping(false);
-    }
-  }, [isTyping, typingIndex, messages]);
+  // ✅ FIX: nếu tab bị ẩn → render full luôn
+  if (document.hidden) {
+    setTypingIndex(fullText.length);
+    setIsTyping(false);
+    return;
+  }
 
+  let chunkSize = 3;
+  let speed = 12;
+
+  if (fullText.length > 300) {
+    chunkSize = 8;
+    speed = 4;
+  } else if (fullText.length > 150) {
+    chunkSize = 5;
+    speed = 6;
+  }
+
+  if (typingIndex < fullText.length) {
+    const timer = setTimeout(() => {
+      setTypingIndex((prev) => {
+        const next = prev + chunkSize;
+        return next > fullText.length ? fullText.length : next;
+      });
+    }, speed);
+
+    return () => clearTimeout(timer);
+  } else {
+    setIsTyping(false);
+  }
+}, [isTyping, typingIndex, messages]);
+  
   async function loadConversation(id) {
     if (!user) return;
     setLoading(true);
