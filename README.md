@@ -10,147 +10,6 @@ A production-ready fullstack web application for AI-powered conversations with u
 
 ---
 
-## ⚡ Quick Start
-
-### Prerequisites
-- Node.js 18+ and npm
-- Git account (to push to Github)
-- Accounts for: Supabase, Render, Vercel (for deployment)
-
-### Local Development
-
-**Windows:**
-```bash
-setup.bat
-```
-
-**macOS/Linux:**
-```bash
-bash setup.sh
-```
-
-Or manually:
-```bash
-# Backend
-cd backend
-cp .env.example .env
-# Update .env with your credentials
-npm install
-npm run dev
-
-# Frontend (new terminal)
-cd frontend
-npm install
-npm run dev
-```
-
-Access at: `http://localhost:5173`
-
----
-
-## 🚀 Deployment
-
-### Three-Step Deployment Process
-
-#### Step 1: Push to GitHub
-Before deploying, push your project to GitHub for version control and auto-deployment:
-
-- **Quick Guide**: See [PUSH_GITHUB_QUICK.md](./PUSH_GITHUB_QUICK.md) (10 minutes)
-- **Automated Script**: 
-  - Windows: `.\push-to-github.ps1`
-  - macOS/Linux: `bash push-to-github.sh`
-- **Complete Guide**: See [GITHUB_PUSH_GUIDE.md](./GITHUB_PUSH_GUIDE.md)
-- **Setup Checklist**: See [GITHUB_COMPLETE_CHECKLIST.md](./GITHUB_COMPLETE_CHECKLIST.md)
-- **Workflow**: See [GITHUB_DEPLOYMENT_WORKFLOW.md](./GITHUB_DEPLOYMENT_WORKFLOW.md)
-
-#### Step 2: Deploy Services
-
-**Complete setup guide:** See [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)
-
-**Quick reference:** See [DEPLOYMENT_QUICK_START.md](./DEPLOYMENT_QUICK_START.md)
-
-Services configured:
-1. **Database**: Supabase (PostgreSQL)
-   - Free tier: 500 MB storage
-   - Auto-backup enabled
-
-2. **Backend**: Render
-   - Free tier: Limited resources
-   - Auto-deploy from GitHub enabled
-
-3. **Frontend**: Vercel
-   - Free tier: Unlimited deployments
-   - Auto-deploy from GitHub enabled
-
-**Estimated total setup time:** 45 minutes
-
-#### Step 3: Connect Auto-Deploy
-
-After pushing to GitHub, Render and Vercel will automatically:
-- Rebuild on every `git push`
-- Deploy new versions instantly
-- Show logs for debugging
-
----
-
-### 📚 All Deployment Documentation
-
-| Document | Purpose | Time |
-|----------|---------|------|
-| [START_HERE.md](./START_HERE.md) | 30-min quick start | 30 min |
-| [PUSH_GITHUB_QUICK.md](./PUSH_GITHUB_QUICK.md) | Quick GitHub push | 10 min |
-| [GITHUB_PUSH_GUIDE.md](./GITHUB_PUSH_GUIDE.md) | Complete GitHub guide | 20 min |
-| [GITHUB_COMPLETE_CHECKLIST.md](./GITHUB_COMPLETE_CHECKLIST.md) | Full checklist | - |
-| [GITHUB_DEPLOYMENT_WORKFLOW.md](./GITHUB_DEPLOYMENT_WORKFLOW.md) | Auto-deploy workflow | - |
-| [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md) | Full deployment guide | 45 min |
-| [DEPLOYMENT_QUICK_START.md](./DEPLOYMENT_QUICK_START.md) | Quick reference | - |
-| [DEPLOYMENT_CHECKLIST.md](./DEPLOYMENT_CHECKLIST.md) | Setup checklist | - |
-| [ARCHITECTURE.md](./ARCHITECTURE.md) | System architecture | - |
-| [MIGRATION_GUIDE.md](./MIGRATION_GUIDE.md) | Database migration | - |
-
----
-
-### 🔧 Environment Variables
-
-Before deployment, create these environment files:
-
-**Backend** (`backend/.env`):
-```env
-DB_HOST=your-supabase-host.supabase.co
-DB_PORT=5432
-DB_USER=postgres
-DB_PASSWORD=your-password
-DB_NAME=postgres
-JWT_SECRET=your-random-secret-32-chars
-GEMINI_API_KEY=your-google-api-key
-GEMINI_MODEL=gemini-pro
-NODE_ENV=production
-CLIENT_ORIGIN=https://your-frontend.vercel.app
-```
-
-**Frontend** (`frontend/.env.production`):
-```env
-VITE_API_BASE_URL=https://your-backend.onrender.com
-```
-
-See [ENV_REFERENCE.md](./ENV_REFERENCE.md) for detailed guide.
-
----
-
-### 💰 Cost Estimate
-
-```
-Supabase (Database):  $0/month (free tier)
-Render (Backend):     $0/month (free tier, sleeps after 15min)
-Vercel (Frontend):    $0/month (free tier, unlimited)
-────────────────────────────────────
-TOTAL:                $0/month ✅
-```
-
-Upgrade only when needed for better performance.
-
----
-
 ## ✨ Features
 
 ### Core Chat Features
@@ -178,6 +37,48 @@ Upgrade only when needed for better performance.
 - ⌨️ **Keyboard Shortcuts** - Enter to send
 - 🎯 **Sidebar Navigation** - Quick access
 - ♿ **Accessible UI** - WCAG-compliant
+
+---
+
+## 📷 Screenshots
+
+### 💬 Chat
+
+<p align="center">
+  <img src="frontend/public/home-dark.png" width="45%" alt="Chat Dark Mode" />
+  <img src="frontend/public/home-light.png" width="45%" alt="Chat Light Mode" />
+</p>
+
+---
+
+### 🛠️ Admin Dashboard
+
+<p align="center">
+  <img src="frontend/public/admin.png" width="70%" alt="Admin Dashboard" />
+</p>
+
+---
+
+### 📱 Mobile
+
+<p align="center">
+  <img src="frontend/public/mobile-chat.png" width="30%" alt="Mobile Chat" />
+  <img src="frontend/public/mobile-sidebar.png" width="30%" alt="Mobile Sidebar" />
+</p>
+
+---
+
+### 💰 Cost Estimate
+
+```
+Supabase (Database):  $0/month (free tier)
+Render (Backend):     $0/month (free tier, sleeps after 15min)
+Vercel (Frontend):    $0/month (free tier, unlimited)
+────────────────────────────────────
+TOTAL:                $0/month ✅
+```
+
+Upgrade only when needed for better performance.
 
 ---
 
@@ -209,10 +110,35 @@ MiniChatGPT/
 │   └── package.json
 │
 ├── database/
-│   └── mini_chatgpt.sql        # MySQL schema
+│   └── mini_chatgpt.sql        # PostgreSQL schema
 │
 │
 └── README.md                    # This file
+```
+
+---
+
+### 🔧 Environment Variables
+
+Before deployment, create these environment files:
+
+**Backend** (`backend/.env`):
+```env
+DB_HOST=your-supabase-host.supabase.co
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=your-password
+DB_NAME=postgres
+JWT_SECRET=your-random-secret-32-chars
+GEMINI_API_KEY=your-google-api-key
+GEMINI_MODEL=gemini-pro
+NODE_ENV=production
+CLIENT_ORIGIN=https://your-frontend.vercel.app
+```
+
+**Frontend** (`frontend/.env.production`):
+```env
+VITE_API_BASE_URL=https://your-backend.onrender.com
 ```
 
 ---
@@ -221,18 +147,20 @@ MiniChatGPT/
 
 ### Prerequisites
 - **Node.js** 16+ (LTS recommended)
-- **MySQL** 8.0+ (local or remote)
+- **PostgreSQL** 13+ (local or remote)
 - **Google API Key** for Gemini API
 
 ### 1️⃣ Database Setup
 
 ```bash
 # Create database
-mysql -u root -p < database/mini_chatgpt.sql
+psql -U postgres -c "CREATE DATABASE mini_chatgpt;"
+
+# Import database
+psql -U postgres -d mini_chatgpt -f database/mini_chatgpt.sql
 
 # Make yourself admin (optional)
-mysql -u root -p
-UPDATE users SET role='admin' WHERE email='your_email@example.com';
+psql -U postgres -d mini_chatgpt -c "UPDATE users SET role='admin' WHERE email='your_email@example.com';"
 ```
 
 ### 2️⃣ Backend Setup
@@ -272,40 +200,6 @@ Frontend runs at `http://localhost:5173`
 
 ---
 
-## ⚙️ Configuration
-
-### Backend Environment Variables
-
-```env
-# Database
-DB_HOST=localhost
-DB_USER=root
-DB_PASSWORD=your_password
-DB_NAME=mini_chatgpt
-
-# JWT
-JWT_SECRET=your_random_secret_key_here
-
-# Google Gemini API
-GEMINI_API_KEY=your_google_api_key
-GEMINI_MODEL=gemini-1.5-flash
-
-# CORS
-CLIENT_ORIGIN=http://localhost:5173
-
-# Node Environment
-NODE_ENV=development
-PORT=5000
-```
-
-### Frontend Environment Variables
-
-```env
-VITE_API_BASE_URL=http://localhost:5000
-```
-
----
-
 ## 📚 API Documentation
 
 ### Authentication Endpoints
@@ -332,111 +226,6 @@ VITE_API_BASE_URL=http://localhost:5000
 |--------|----------|-------------|
 | `GET` | `/users` | Get all users (admin only) |
 | `DELETE` | `/users/:id` | Delete user (admin only) |
-
----
-
-## 🔧 Development
-
-### Start Development Environment
-
-**Terminal 1 - Backend:**
-```bash
-cd backend
-npm run dev
-```
-
-**Terminal 2 - Frontend:**
-```bash
-cd frontend
-npm run dev
-```
-
-### Running Tests
-
-```bash
-# Backend tests (if available)
-cd backend
-npm test
-
-# Frontend tests (if available)
-cd frontend
-npm test
-```
-
-### Code Structure Best Practices
-
-- **React Components**: Keep components focused and reusable
-- **API Calls**: Use `api/client.js` for all requests
-- **Error Handling**: Use `errorClassifier.js` to categorize errors
-- **State Management**: Use React context for auth and theme
-- **Styling**: Use CSS variables for consistent theming
-
----
-
-## 🚨 Troubleshooting
-
-### Common Issues
-
-**Problem: 429 Too Many Requests**
-- **Cause**: API quota exceeded
-- **Fix**: Check your Gemini API quota, wait until next day for reset
-
-**Problem: Database connection failed**
-- Check MySQL is running: `mysql -u root -p -e "SELECT 1"`
-- Verify `.env` credentials match MySQL
-- Ensure database exists: `CREATE DATABASE mini_chatgpt;`
-
-**Problem: CORS errors**
-- Verify `CLIENT_ORIGIN` in backend `.env` matches frontend URL
-- Check both backend and frontend are running
-- Clear browser cache and retry
-
-**Problem: Conversations not loading**
-- Check user is logged in (JWT token valid)
-- Verify conversation belongs to logged-in user (security check)
-- Check backend logs for database errors
-
-**Problem: Slow responses**
-- Check cache is enabled (should improve 2nd+ calls)
-- Monitor API rate limits in backend logs
-- Consider upgrading Gemini API plan
-
----
-
-## 🐳 Docker Deployment (Optional)
-
-```bash
-# Build backend image
-cd backend
-docker build -t minichatgpt-backend .
-
-# Build frontend image
-cd frontend
-docker build -t minichatgpt-frontend .
-
-# Run with docker-compose
-docker-compose up -d
-```
-
----
-
-## 📊 Performance Tips
-
-1. **Enable Caching**
-   - Response caching reduces API calls
-   - Cache is cleared when user logs out
-
-2. **Optimize Conversations**
-   - Archive old conversations to reduce queries
-   - Use pagination for large conversation lists
-
-3. **Rate Limiting**
-   - Default: 100 requests per 15 minutes per user
-   - Adjust in `backend/src/utils/rateLimiter.js` if needed
-
-4. **Database Optimization**
-   - Create indexes on frequently queried columns
-   - Archive messages older than 90 days
 
 ---
 
@@ -468,42 +257,9 @@ docker-compose up -d
 
 ---
 
-## 📱 Browser Support
-
-| Browser | Support |
-|---------|---------|
-| Chrome | ✅ Latest 2 versions |
-| Safari | ✅ Latest 2 versions |
-| Firefox | ✅ Latest 2 versions |
-| Edge | ✅ Latest 2 versions |
-| Mobile Chrome | ✅ Latest |
-| Mobile Safari | ✅ Latest |
-
----
-
-## 🤝 Contributing
-
-1. Create a feature branch: `git checkout -b feature/my-feature`
-2. Make changes and test thoroughly
-3. Commit: `git commit -m "feat: add my feature"`
-4. Push: `git push origin feature/my-feature`
-5. Open Pull Request
-
----
-
 ## 📝 License
 
 MIT License - see LICENSE file for details
-
----
-
-## 📞 Support
-
-For issues or questions:
-1. Check [Troubleshooting](#-troubleshooting) section
-2. Review relevant guide (see [Documentation](#-documentation))
-3. Check backend logs: `tail -f backend.log`
-4. Check browser console (F12 → Console tab)
 
 ---
 
@@ -512,4 +268,3 @@ For issues or questions:
 Built with ❤️ using React, Node.js, and Google Gemini API
 
 **Status**: ✅ Production Ready | Built: April 2026
-
