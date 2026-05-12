@@ -2,6 +2,7 @@ const { GoogleGenAI } = require("@google/genai");
 const { env } = require("./env");
 const { get: getCached, set: setCached } = require("./cache");
 
+
 const genAI = new GoogleGenAI(env.GEMINI_API_KEY);
 
 const SYSTEM_INSTRUCTION =
@@ -14,10 +15,8 @@ async function generateAssistantReply({ contents }) {
   if (cached) return cached;
 
   try {
-    const model = genAI.getGenerativeModel({ 
-      model: env.GEMINI_MODEL,
-      systemInstruction: SYSTEM_INSTRUCTION,
-    });
+    
+    const model = genAI.getGenerativeModel({ model: env.GEMINI_MODEL });
 
     const result = await model.generateContent({
       contents,
@@ -25,9 +24,9 @@ async function generateAssistantReply({ contents }) {
         temperature: 0.5,
         maxOutputTokens: 600,
       },
+      
     });
 
-    // Cần await response trước khi lấy text
     const response = await result.response;
     const text = response.text();
     const trimmed = text.trim();
@@ -36,10 +35,10 @@ async function generateAssistantReply({ contents }) {
     return trimmed;
 
   } catch (err) {
-    // SỬA TẠI ĐÂY: Cách này sẽ ép Error Object hiện hết thuộc tính ra log
     console.error("--- CHI TIẾT LỖI GEMINI ---");
     console.error("Message:", err.message);
     console.error("Status:", err.status);
+
     console.error("Full Error:", JSON.stringify(err, Object.getOwnPropertyNames(err)));
     console.error("---------------------------");
 
@@ -47,22 +46,16 @@ async function generateAssistantReply({ contents }) {
     const status = err?.status || 500;
     const e = new Error("AI service temporarily unavailable");
 
-    // Logic phân loại lỗi
     if (msg.includes("location is not supported") || msg.includes("FAILED_PRECONDITION")) {
       e.status = 400;
       e.message = "Vùng đặt máy chủ hiện bị Google hạn chế. Hãy đổi Region sang US trên Render.";
     } 
     else if (status === 429 || msg.includes("429") || msg.toLowerCase().includes("quota")) {
       e.status = 429;
-      e.message = "Hết hạn mức hoặc yêu cầu quá nhanh. Thử lại sau nhé!";
-    }
-    else if (status === 404 || msg.includes("404")) {
-      e.status = 404;
-      e.message = `Không tìm thấy model. Kiểm tra lại GEMINI_MODEL.`;
+      e.message = "Hết hạn mức hoặc yêu cầu quá nhanh.";
     }
     else {
       e.status = 503;
-      // Trả về chính thông báo lỗi của Google để debug nhanh hơn thay vì thông báo chung chung
       e.message = `Lỗi Gemini: ${msg || "Server Error"}`;
     }
 
