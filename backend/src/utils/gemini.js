@@ -2,7 +2,7 @@ const { GoogleGenAI } = require("@google/genai");
 const { env } = require("./env");
 const { get: getCached, set: setCached } = require("./cache");
 
-const genAI = new GoogleGenAI(env.GEMINI_API_KEY); // Thường truyền trực tiếp API Key
+const genAI = new GoogleGenAI(env.GEMINI_API_KEY);
 
 const SYSTEM_INSTRUCTION =
   "You are a friendly and helpful AI assistant in a chat app. Provide clear, conversational responses. Use the chat history to maintain context and continuity. Be concise but helpful, and try to give direct answers unless the user asks for more detail.";
@@ -10,82 +10,60 @@ const SYSTEM_INSTRUCTION =
 async function generateAssistantReply({ contents }) {
   const cacheKey = JSON.stringify(contents);
 
-  // 1. Kiểm tra cache
   const cached = getCached(cacheKey);
   if (cached) return cached;
 
   try {
-    // Lưu ý: Cú pháp getGenerativeModel thường được dùng trong SDK mới
     const model = genAI.getGenerativeModel({ 
       model: env.GEMINI_MODEL,
-      systemInstruction: SYSTEM_INSTRUCTION, // System Instruction nên đặt ở đây
+      systemInstruction: SYSTEM_INSTRUCTION,
     });
 
     const result = await model.generateContent({
       contents,
-      generationConfig: { // Đổi 'config' thành 'generationConfig' theo chuẩn SDK
+      generationConfig: { 
         temperature: 0.5,
         maxOutputTokens: 600,
       },
     });
 
+    // Cần await response trước khi lấy text
     const response = await result.response;
     const text = response.text();
     const trimmed = text.trim();
 
-    // 2. Lưu cache
     setCached(cacheKey, trimmed);
-
     return trimmed;
 
   } catch (err) {
-    console.error("FULL GEMINI ERROR DETAILS:", JSON.stringify(err, null, 2));
+    // SỬA TẠI ĐÂY: Cách này sẽ ép Error Object hiện hết thuộc tính ra log
+    console.error("--- CHI TIẾT LỖI GEMINI ---");
+    console.error("Message:", err.message);
+    console.error("Status:", err.status);
+    console.error("Full Error:", JSON.stringify(err, Object.getOwnPropertyNames(err)));
+    console.error("---------------------------");
 
     const msg = String(err?.message || "");
     const status = err?.status || 500;
     const e = new Error("AI service temporarily unavailable");
-    e.status = 503;
 
-    // --- LOGIC PHÂN LOẠI LỖI MỚI ---
-
-    // A. Lỗi khu vực (Location) - Lỗi bạn đang gặp
+    // Logic phân loại lỗi
     if (msg.includes("location is not supported") || msg.includes("FAILED_PRECONDITION")) {
       e.status = 400;
-      e.message = "Vùng đặt máy chủ (Singapore) hiện bị Google hạn chế. Vui lòng đổi Region sang US (Oregon/Ohio) trên Render.";
+      e.message = "Vùng đặt máy chủ hiện bị Google hạn chế. Hãy đổi Region sang US trên Render.";
     } 
-    
-    // B. Quota / Rate Limit
-    else if (
-      status === 429 || 
-      msg.includes("429") || 
-      msg.toLowerCase().includes("quota") || 
-      msg.toLowerCase().includes("resource exhausted")
-    ) {
+    else if (status === 429 || msg.includes("429") || msg.toLowerCase().includes("quota")) {
       e.status = 429;
-      if (msg.toLowerCase().includes("quota")) {
-        e.message = "Hết hạn mức sử dụng trong ngày (Daily Quota). Thử lại vào ngày mai nhé!";
-        e.isQuotaExceeded = true;
-      } else {
-        e.message = "Bạn đang gửi yêu cầu quá nhanh. Đợi một chút rồi thử lại nhé.";
-        e.isRateLimit = true;
-      }
+      e.message = "Hết hạn mức hoặc yêu cầu quá nhanh. Thử lại sau nhé!";
     }
-
-    // C. Model không tồn tại
     else if (status === 404 || msg.includes("404")) {
       e.status = 404;
-      e.message = `Không tìm thấy model "${env.GEMINI_MODEL}". Kiểm tra lại biến GEMINI_MODEL.`;
+      e.message = `Không tìm thấy model. Kiểm tra lại GEMINI_MODEL.`;
     }
-
-    // D. Lỗi API Key hoặc cấu hình sai (400 chung)
-    else if (status === 400) {
-      e.status = 400;
-      e.message = "Yêu cầu không hợp lệ. Có thể do API Key hoặc cấu hình model.";
-    }
-
-    // E. Lỗi Server mặc định
     else {
-      e.message = "Hệ thống AI đang gặp sự cố nhỏ. Thử lại sau vài giây nhé!";
+      e.status = 503;
+      // Trả về chính thông báo lỗi của Google để debug nhanh hơn thay vì thông báo chung chung
+      e.message = `Lỗi Gemini: ${msg || "Server Error"}`;
     }
 
     e.cause = err;
