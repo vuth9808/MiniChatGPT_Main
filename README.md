@@ -4,7 +4,7 @@ A production-ready fullstack web application for AI-powered conversations with u
 
 **Tech Stack:** 
 - 🎨 Frontend: React + Vite | Vercel
-- 🖥️ Backend: Node.js + Express | Render
+- 🖥️ Backend: Node.js + Express | Vercel
 - 💾 Database: PostgreSQL | Supabase
 - 🤖 AI: Google Generative AI (Gemini)
 
@@ -72,7 +72,7 @@ A production-ready fullstack web application for AI-powered conversations with u
 
 ```
 Supabase (Database):  $0/month (free tier)
-Render (Backend):     $0/month (free tier, sleeps after 15min)
+Vercel (Backend):     $0/month (free tier, sleeps after 15min)
 Vercel (Frontend):    $0/month (free tier, unlimited)
 ────────────────────────────────────
 TOTAL:                $0/month ✅
@@ -106,6 +106,7 @@ MiniChatGPT/
 │   │   ├── app.js              # Express app setup
 │   │   ├── server.js           # Server entry point
 │   │   └── db.js               # Database connection
+|   ├── vercel.json
 │   ├── .env.example
 │   └── package.json
 │
@@ -124,21 +125,17 @@ Before deployment, create these environment files:
 
 **Backend** (`backend/.env`):
 ```env
-DB_HOST=your-supabase-host.supabase.co
-DB_PORT=5432
-DB_USER=postgres
-DB_PASSWORD=your-password
-DB_NAME=postgres
+DATABASE_URL=your-supabase-postgres-url
 JWT_SECRET=your-random-secret-32-chars
 GEMINI_API_KEY=your-google-api-key
-GEMINI_MODEL=gemini-pro
+GEMINI_MODEL=gemini-flash
 NODE_ENV=production
 CLIENT_ORIGIN=https://your-frontend.vercel.app
 ```
 
 **Frontend** (`frontend/.env.production`):
 ```env
-VITE_API_BASE_URL=https://your-backend.onrender.com
+VITE_API_BASE_URL=https://your-backend.vercel.app
 ```
 
 ---
@@ -171,7 +168,7 @@ cd backend
 # Copy and configure environment
 cp .env.example .env
 # Edit .env with your values:
-# - DB_HOST, DB_USER, DB_PASSWORD, DB_NAME
+# - DATABASE_URL
 # - JWT_SECRET (generate a random string)
 # - GEMINI_API_KEY (from Google AI Studio)
 # - CLIENT_ORIGIN=http://localhost:5173
