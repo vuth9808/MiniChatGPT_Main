@@ -44,3 +44,9 @@ Thumbs.db
 *.tmp
 *.bak
 *.temp
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+!.env.example
