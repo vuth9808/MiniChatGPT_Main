@@ -1,5 +1,6 @@
 import axios from "axios";
 
+// Debug: trigger Azure Static Web Apps redeployment
 console.log(import.meta.env.VITE_API_BASE_URL);
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"
