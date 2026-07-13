@@ -36,17 +36,28 @@ jobs:
             return await coredemo.getIDToken()
           result-encoding: string
 
+      # Tạo file .env.production từ GitHub Secret
+      - name: Create .env.production
+        run: |
+          cat > frontend/.env.production << EOF
+          VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}
+          EOF
+
+      # Kiểm tra file đã được tạo (không lộ giá trị)
+      - name: Verify .env.production
+        run: |
+          echo "Checking .env.production..."
+          test -f frontend/.env.production
+          grep "^VITE_API_BASE_URL=" frontend/.env.production | sed 's/=.*/=********/'
+
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
-
         env:
           VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
-
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_POLITE_WATER_02177E600 }}
           action: "upload"
-
           app_location: "./frontend"
           api_location: ""
           output_location: "dist"
