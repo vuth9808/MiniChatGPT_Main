@@ -1,267 +1,322 @@
-# 🚀 MiniChatGPT - AI Chat Application
-
-A production-ready fullstack web application for AI-powered conversations with user authentication, chat history management, and admin dashboard.
-
-**Tech Stack:** 
-- 🎨 Frontend: React + Vite | Vercel
-- 🖥️ Backend: Node.js + Express | Vercel
-- 💾 Database: PostgreSQL | Supabase
-- 🤖 AI: Google Generative AI (Gemini)
-
----
-
-## ✨ Features
-
-### Core Chat Features
-- 💬 **Real-time AI Chat** - Powered by Google Gemini API
-- 📝 **Conversation History** - Save and manage chat conversations
-- 🔄 **Smart Error Handling** - Automatic retry logic for failures
-- ⚠️ **Quota Management** - Graceful handling of API quotas
-- 🎯 **Message Caching** - Reduce API calls with smart caching
-
-### User Management
-- 🔐 **Secure Authentication** - JWT-based with bcrypt
-- 👤 **User Profiles** - Register, login, logout
-- 🛡️ **Role-Based Access** - Admin and user roles
-- 📊 **User Statistics** - Activity dashboard
-
-### Admin Features
-- 👥 **User Management** - View and manage users
-- 📈 **Usage Analytics** - Track API usage
-- 🔍 **Conversation Browsing** - View user chats
-- ⚙️ **System Monitoring** - Health checks and logs
-
-### User Experience
-- 📱 **Fully Responsive** - Works on all devices
-- 🎨 **Dark/Light Theme** - Theme toggle
-- ⌨️ **Keyboard Shortcuts** - Enter to send
-- 🎯 **Sidebar Navigation** - Quick access
-- ♿ **Accessible UI** - WCAG-compliant
-
----
-
-## 📷 Screenshots
-
-### 💬 Chat
+# 🤖 MiniChatGPT
 
 <p align="center">
-  <img src="frontend/public/home-dark.png" width="45%" alt="Chat Dark Mode" />
-  <img src="frontend/public/home-light.png" width="45%" alt="Chat Light Mode" />
+
+An AI-powered Full-stack Chat Application with secure authentication, persistent chat history, and intelligent conversations powered by Google Gemini API.
+
+Built with **React**, **Node.js**, **PostgreSQL**, and deployed on **Microsoft Azure** using **GitHub Actions CI/CD**.
+
+</p>
+
+<p align="center">
+
+<a href="https://purple-grass-0b3fec600.7.azurestaticapps.net/">
+<img src="https://img.shields.io/badge/🌐_Live_Demo-0EA5E9?style=for-the-badge"/>
+</a>
+
+<a href="https://github.com/vuth9808/MiniChatGPT_Main">
+<img src="https://img.shields.io/badge/Repository-181717?style=for-the-badge&logo=github&logoColor=white"/>
+</a>
+
+<img src="https://img.shields.io/badge/Microsoft_Azure-0078D4?style=for-the-badge&logo=microsoftazure&logoColor=white"/>
+
+<img src="https://img.shields.io/badge/License-MIT-success?style=for-the-badge"/>
+
 </p>
 
 ---
 
-### 🛠️ Admin Dashboard
+# 📸 Preview
+
+## 💬 Chat
 
 <p align="center">
-  <img src="frontend/public/admin.png" width="70%" alt="Admin Dashboard" />
+
+<img src="frontend/public/home-dark.png" width="47%"/>
+
+<img src="frontend/public/home-light.png" width="47%"/>
+
 </p>
 
 ---
 
-### 📱 Mobile
+## 🛠 Admin Dashboard
 
 <p align="center">
-  <img src="frontend/public/mobile-chat.png" width="30%" alt="Mobile Chat" />
-  <img src="frontend/public/mobile-sidebar.png" width="30%" alt="Mobile Sidebar" />
+
+<img src="frontend/public/admin.png" width="80%"/>
+
 </p>
 
 ---
 
-### 💰 Cost Estimate
+## 📱 Mobile
 
-```
-Supabase (Database):  $0/month (free tier)
-Vercel (Backend):     $0/month (free tier, sleeps after 15min)
-Vercel (Frontend):    $0/month (free tier, unlimited)
-────────────────────────────────────
-TOTAL:                $0/month ✅
-```
+<p align="center">
 
-Upgrade only when needed for better performance.
+<img src="frontend/public/mobile-chat.png" width="30%"/>
+
+<img src="frontend/public/mobile-sidebar.png" width="30%"/>
+
+</p>
 
 ---
 
-## 🏗️ Project Structure
+# ✨ Features
 
-```
-MiniChatGPT/
+- 🤖 AI-powered conversations using Google Gemini API
+- 🔐 Secure JWT Authentication
+- 💬 Persistent Conversation History
+- 👤 User & Admin Dashboard
+- 🛡 Role-Based Authorization
+- ☁ Cloud-native deployment on Microsoft Azure
+- ⚙ Automated CI/CD with GitHub Actions
+- 📱 Fully Responsive Design
+- 🌙 Dark / Light Theme
+- ⚡ Smart Error Handling & Rate Limiting
+
+---
+
+# 🏗 System Architecture
+
+The application follows a cloud-native architecture on Microsoft Azure with automated CI/CD using GitHub Actions.
+
+<p align="center">
+  <img src="frontend/public/architecture.jpg" width="100%" alt="MiniChatGPT Azure Architecture"/>
+</p>
+
+---
+
+### Architecture Overview
+
+- React + Vite frontend hosted on Azure Static Web Apps.
+- Node.js + Express backend deployed on Azure Container Apps.
+- Azure Database for PostgreSQL stores users, conversations, and messages.
+- Azure Key Vault securely manages application secrets.
+- Application Insights collects logs and telemetry.
+- Google Gemini API provides AI-powered responses.
+- GitHub Actions automates CI/CD deployments.
+
+---
+
+# 🛠 Tech Stack
+
+### Frontend
+
+<p>
+
+<img src="https://skillicons.dev/icons?i=react,vite,html,css,tailwind"/>
+
+</p>
+
+---
+
+### Backend
+
+<p>
+
+<img src="https://skillicons.dev/icons?i=nodejs,express"/>
+
+</p>
+
+---
+
+### Database
+
+<p>
+
+<img src="https://skillicons.dev/icons?i=postgres"/>
+
+</p>
+
+---
+
+### Cloud & DevOps
+
+<p>
+
+<img src="https://skillicons.dev/icons?i=azure,git,github,githubactions"/>
+
+</p>
+
+---
+
+### AI
+
+<p>
+
+<img src="https://go-skill-icons.vercel.app/api/icons?i=gemini" height="45"/>
+
+</p>
+
+---
+
+# 📂 Project Structure
+
+```text
+MiniChatGPT
+│
+├── frontend/
 │   ├── src/
-│   │   ├── pages/              # Page components (Chat, Login, History, Admin)
-│   │   ├── components/         # Reusable components (AppShell, Auth, etc)
-│   │   ├── state/              # React context (auth, theme)
-│   │   ├── utils/              # Utilities (error classifier, caching, etc)
-│   │   ├── api/                # API client configuration
-│   │   ├── App.jsx
-│   │   └── styles.css          # Responsive design (mobile-first)
-│   ├── index.html
-│   ├── vite.config.js
+│   ├── public/
 │   └── package.json
 │
-├── backend/                     # Node.js + Express API
+├── backend/
 │   ├── src/
-│   │   ├── routes/             # API endpoints (auth, chat, conversations)
-│   │   ├── middleware/         # Auth, error handling, logging
-│   │   ├── utils/              # Gemini API, error handler, caching, rate limiter
-│   │   ├── app.js              # Express app setup
-│   │   ├── server.js           # Server entry point
-│   │   └── db.js               # Database connection
-|   ├── vercel.json
-│   ├── .env.example
-│   └── package.json
+│   ├── package.json
+│   └── Dockerfile
 │
 ├── database/
-│   └── mini_chatgpt.sql        # PostgreSQL schema
+│   └── mini_chatgpt.sql
 │
+├── .github/
+│   └── workflows/
 │
-└── README.md                    # This file
+└── README.md
 ```
 
 ---
 
-### 🔧 Environment Variables
+# ⚙ Environment Variables
 
-Before deployment, create these environment files:
+## Backend
 
-**Backend** (`backend/.env`):
 ```env
-DATABASE_URL=your-supabase-postgres-url
-JWT_SECRET=your-random-secret-32-chars
-GEMINI_API_KEY=your-google-api-key
-GEMINI_MODEL=gemini-flash
+DATABASE_URL=
+
+JWT_SECRET=
+
+GEMINI_API_KEY=
+
+GEMINI_MODEL=
+
+CLIENT_ORIGIN=
+
 NODE_ENV=production
-CLIENT_ORIGIN=https://your-frontend.vercel.app
-```
-
-**Frontend** (`frontend/.env.production`):
-```env
-VITE_API_BASE_URL=https://your-backend.vercel.app
 ```
 
 ---
 
-## 🚀 Quick Start
+## Frontend
 
-### Prerequisites
-- **Node.js** 16+ (LTS recommended)
-- **PostgreSQL** 13+ (local or remote)
-- **Google API Key** for Gemini API
+```env
+VITE_API_BASE_URL=
+```
 
-### 1️⃣ Database Setup
+---
+
+# 🚀 Getting Started
+
+## Clone Repository
 
 ```bash
-# Create database
-psql -U postgres -c "CREATE DATABASE mini_chatgpt;"
-
-# Import database
-psql -U postgres -d mini_chatgpt -f database/mini_chatgpt.sql
-
-# Make yourself admin (optional)
-psql -U postgres -d mini_chatgpt -c "UPDATE users SET role='admin' WHERE email='your_email@example.com';"
+git clone https://github.com/vuth9808/MiniChatGPT_Main.git
 ```
 
-### 2️⃣ Backend Setup
+---
+
+## Backend
 
 ```bash
 cd backend
 
-# Copy and configure environment
-cp .env.example .env
-# Edit .env with your values:
-# - DATABASE_URL
-# - JWT_SECRET (generate a random string)
-# - GEMINI_API_KEY (from Google AI Studio)
-# - CLIENT_ORIGIN=http://localhost:5173
-
-# Install and run
 npm install
+
 npm run dev
 ```
 
-Backend runs at `http://localhost:5000`
+---
 
-### 3️⃣ Frontend Setup
+## Frontend
 
 ```bash
 cd frontend
 
-# Copy environment (optional - uses defaults)
-cp .env.example .env
-
-# Install and run
 npm install
+
 npm run dev
 ```
 
-Frontend runs at `http://localhost:5173`
+---
+
+# 📡 REST API
+
+## Authentication
+
+| Method | Endpoint |
+|----------|----------|
+| POST | /register |
+| POST | /login |
+| POST | /logout |
 
 ---
 
-## 📚 API Documentation
+## Conversations
 
-### Authentication Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/register` | Register new user |
-| `POST` | `/login` | Login user |
-| `POST` | `/logout` | Clear session |
-
-### Conversation Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/conversations` | Get all user conversations |
-| `POST` | `/conversations` | Create new conversation |
-| `GET` | `/conversations/:id` | Get conversation with messages |
-| `DELETE` | `/conversations/:id` | Delete conversation |
-| `POST` | `/conversations/:id/messages` | Send message to conversation |
-
-### Admin Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/users` | Get all users (admin only) |
-| `DELETE` | `/users/:id` | Delete user (admin only) |
+| Method | Endpoint |
+|----------|----------|
+| GET | /conversations |
+| POST | /conversations |
+| GET | /conversations/:id |
+| DELETE | /conversations/:id |
+| POST | /conversations/:id/messages |
 
 ---
 
-## 🔐 Security
+## Admin
 
-- ✅ **Password Hashing**: bcryptjs with salt rounds
-- ✅ **JWT Tokens**: Secure, HttpOnly cookies
-- ✅ **SQL Injection Prevention**: Parameterized queries
-- ✅ **CORS Protection**: Whitelist allowed origins
-- ✅ **Rate Limiting**: Per-user request throttling
-- ✅ **XSS Protection**: React's built-in escaping
-- ✅ **CSRF Protection**: SameSite cookie flag
+| Method | Endpoint |
+|----------|----------|
+| GET | /users |
+| DELETE | /users/:id |
 
 ---
 
-## 🧪 Testing Checklist
+# 🔒 Security
 
-- [ ] Register new user
-- [ ] Login with correct/incorrect credentials
-- [ ] Send message and receive AI response
-- [ ] Save conversation to history
-- [ ] Load previous conversation
-- [ ] Delete conversation
-- [ ] View admin dashboard
-- [ ] Delete user (admin only)
-- [ ] Toggle dark/light theme
-- [ ] Test on mobile device (responsive)
-- [ ] Test with quota exhausted (should block sends)
+- JWT Authentication
+- Password Hashing with bcrypt
+- Parameterized SQL Queries
+- Role-Based Authorization
+- CORS Protection
+- Rate Limiting
+- Secure Cookies
 
 ---
 
-## 📝 License
+# 🚀 Deployment
 
-MIT License - see LICENSE file for details
+The application is automatically deployed through **GitHub Actions**.
+
+```text
+GitHub
+      │
+      ▼
+GitHub Actions
+      │
+ ┌────┴────┐
+ ▼         ▼
+Azure Static Web Apps
+Azure Container Apps
+      │
+      ▼
+Azure Database for PostgreSQL
+```
+
+Every push to the main branch automatically triggers the deployment pipeline.
 
 ---
 
-## 🎉 Thank You!
+# 📄 License
 
-Built with ❤️ using React, Node.js, and Google Gemini API
+This project is licensed under the MIT License.
 
-**Status**: ✅ Production Ready | Built: April 2026
+---
+
+# 👨‍💻 Author
+
+**To Hoang Vu**
+
+📧 tohoangvu161225@gmail.com
+
+🌐 https://github.com/vuth9808
